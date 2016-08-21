@@ -8,25 +8,12 @@ Implementing SDL2 tutorial lessons on [lazyfoo.net](http://lazyfoo.net/tutorials
 
 以 [sdl2 的 haskell binding](https://hackage.haskell.org/package/sdl2) 實作[lazyfoo.net](http://lazyfoo.net/tutorials/SDL/) 中之課程題目。  (其中部分已實作在 sdl2 haskell binding 的 repository - [haskell-game/sdl2examples/lazyfoo](https://github.com/haskell-game/sdl2/tree/master/examples/lazyfoo) 中。) 計畫是實作其中 34 個選定的課程來實作。
 
-## Required Packages (必須套件)
-
-System:
-
-* sdl2 - 2.0.3
-* ghc - 7.10.2
-
-Hackages:
-
-* sdl2 - 2.1.1
-* linear - 1.19.1.3
-
-
 ## How to Build and Execute (編譯與執行)
-
+resolver: lts-6.9
 ```bash
-> cabal configure
-> cabal build
-> cabal run #n
+> stack setup
+> stack build
+> stack exec main #n
 ```
 
 where `#n` is the number of lesson.
