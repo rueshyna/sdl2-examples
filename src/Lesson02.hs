@@ -6,24 +6,50 @@ import qualified SDL
 import Linear.V4 (V4(..))
 --
 import Control.Concurrent (threadDelay)
+import Control.Exception (catch,IOException)
 --
 import qualified Config
 --
+import System.Exit (die)
+
 lesson02 :: IO ()
 lesson02 = do
-   SDL.initialize [SDL.InitVideo]
-   window <- SDL.createWindow "Lesson02" Config.winConfig
-   SDL.showWindow window
+   -- initialize SDL
+   run (SDL.initialize [SDL.InitVideo])
+       "SDL could not initialize!"
+
+   -- create window
+   window <- run (SDL.createWindow "Lesson02" Config.winConfig)
+                 "Window could not be created!"
+
+   -- get surface from given window
    gSurface <- SDL.getWindowSurface window
-   SDL.surfaceFillRect gSurface Nothing $
-      V4 minBound minBound minBound maxBound
+
    -- load image file as a surface
-   pictureS <- SDL.loadBMP "./img/02/Broom.bmp"
+   pictureS <- run (SDL.loadBMP "./img/02/Broom.bmp")
+                   "Unable to load image!"
+
    -- blit(copy/show) image surface onto window surface
    SDL.surfaceBlit pictureS Nothing gSurface Nothing
+
+   -- update the surface
    SDL.updateWindowSurface window
-   threadDelay 5000000
-   SDL.destroyWindow window
-   -- releace surface
+
+   -- wait two seconds
+   threadDelay 2000000
+
+   -- free surface
    SDL.freeSurface pictureS
+
+   -- destroy window
+   SDL.destroyWindow window
+
+   -- quit SDL subsystems
    SDL.quit
+
+-- if something wrong then exit the program
+run :: IO a -> String -> IO a
+run exec errMessage =
+    catch exec
+          (\e -> do let err = show (e :: IOException)
+                    die (errMessage ++ " SDL_Error: "++ err))

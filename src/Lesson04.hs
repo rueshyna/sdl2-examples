@@ -10,23 +10,34 @@ import Data.Maybe
 --
 import Control.Concurrent (threadDelay)
 import Control.Monad (unless)
+import Control.Exception (catch,IOException)
 --
 import qualified Config
 --
+import System.Exit (die)
+
 lesson04 :: IO ()
 lesson04 = do
-   SDL.initialize [SDL.InitVideo]
-   window <- SDL.createWindow "Lesson04" Config.winConfig
-   SDL.showWindow window
+   -- initialize SDL
+   run (SDL.initialize [SDL.InitVideo])
+       "SDL could not initialize!"
+
+   -- create window
+   window <- run (SDL.createWindow "Lesson04" Config.winConfig)
+                 "Window could not be created!"
+
    gSurface <- SDL.getWindowSurface window
+
    --
-   picDefault <- SDL.loadBMP "./img/04/press.bmp"
-   picUp      <- SDL.loadBMP "./img/04/up.bmp"
-   picDown    <- SDL.loadBMP "./img/04/down.bmp"
-   picLeft    <- SDL.loadBMP "./img/04/left.bmp"
-   picRight   <- SDL.loadBMP "./img/04/right.bmp"
+   picDefault <- run (SDL.loadBMP "./img/04/press.bmp") "failed to load up image!"
+   picUp      <- run (SDL.loadBMP "./img/04/up.bmp") "failed to load up image!"
+   picDown    <- run (SDL.loadBMP "./img/04/down.bmp") "failed to load up image!"
+   picLeft    <- run (SDL.loadBMP "./img/04/left.bmp") "failed to load up image!"
+   picRight   <- run (SDL.loadBMP "./img/04/right.bmp") "failed to load up image!"
+
    -- function to convert a event into a surface
    let e2s = Last.(eventToSurface picUp picDown picLeft picRight picDefault).SDL.eventPayload
+
    -- define main loop with extra parameter: current blitted surface
    let loop = \prevSurface -> do
          events <- SDL.pollEvents
@@ -37,14 +48,13 @@ lesson04 = do
                $ getLast
                -- convert all events into a list of Maybe surface
                $ foldMap e2s events
-         SDL.surfaceFillRect gSurface Nothing $
-            V4 minBound minBound minBound maxBound
          SDL.surfaceBlit newSurface Nothing gSurface Nothing
          SDL.updateWindowSurface window
-         threadDelay 20000
          unless quit $ loop newSurface
+
    -- exec main loop
    loop picDefault
+
    -- release resources
    SDL.destroyWindow window
    SDL.freeSurface picDefault
@@ -77,3 +87,10 @@ eventToSurface picUp
       otherwise        -> Nothing
 -- if input event is not KeyboardEvent then return Nothing
 eventToSurface _ _ _ _ _ _      = Nothing
+
+-- if something wrong then exit the program
+run :: IO a -> String -> IO a
+run exec errMessage =
+    catch exec
+          (\e -> do let err = show (e :: IOException)
+                    die (errMessage ++ " SDL_Error: "++ err))
