@@ -6,7 +6,7 @@ import qualified SDL
 import Linear.V4 (V4(..))
 --
 import Control.Concurrent (threadDelay)
-import Control.Exception
+import Control.Exception (catch,IOException)
 --
 import qualified Config
 --
@@ -44,8 +44,6 @@ lesson01 = do
    SDL.quit
 
 -- if something wrong then exit the program
--- IO a   : SDL call
--- String : error message
 run :: IO a -> String -> IO a
 run exec errMessage =
     catch exec
