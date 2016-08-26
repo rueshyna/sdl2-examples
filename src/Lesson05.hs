@@ -6,7 +6,6 @@ import qualified SDL
 import Linear.V2 (V2(V2))
 import Linear.Affine(Point(P))
 --
-import Control.Concurrent (threadDelay)
 import Control.Monad (unless)
 import Control.Applicative ((<*))
 import Control.Exception (catch,IOException)
@@ -56,7 +55,6 @@ lesson05 = do
          SDL.surfaceBlitScaled sf Nothing gSurface
             $ Just $ SDL.Rectangle (P (V2 0 0)) (V2 200 200)
          SDL.updateWindowSurface window
-         threadDelay 20000
          unless quit loop
    loop
 
