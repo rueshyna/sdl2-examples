@@ -5,22 +5,30 @@ module Lesson07 where
 import qualified SDL
 import Linear.V4 (V4(..))
 --
-import Control.Concurrent (threadDelay)
 import Control.Monad (unless,when)
+import Control.Exception (catch,IOException)
 --
 import qualified Config
 --
+import System.Exit (die)
+
 lesson07 :: IO ()
 lesson07 = do
-   SDL.initialize [SDL.InitVideo]
-   window <- SDL.createWindow "Lesson07" Config.winConfig
-   renderer <- SDL.createRenderer window (-1) Config.rdrConfig
+   -- initialize SDL
+   run (SDL.initialize [SDL.InitVideo])
+       "SDL could not initialize!"
 
+   -- create window
+   window <- run (SDL.createWindow "Lesson07" Config.winConfig)
+                 "Window could not be created!"
    -- using Hint, comment out for seeing the effects
    -- reference: https://en.wikipedia.org/wiki/Image_scaling#Scaling_methods
    -- ***************
    SDL.HintRenderScaleQuality SDL.$= SDL.ScaleLinear
    -- ***************
+
+   renderer <- run (SDL.createRenderer window (-1) Config.rdrConfig)
+                   "Renderer could not be created!"
 
    -- set a color for renderer
    SDL.rendererDrawColor renderer
@@ -33,7 +41,6 @@ lesson07 = do
    imgTx <- SDL.createTextureFromSurface renderer imgSf
    SDL.freeSurface imgSf
 
-   SDL.showWindow window
    let
       loop = do
          events <- SDL.pollEvents
@@ -46,7 +53,6 @@ lesson07 = do
          -- the present function forces a renderer to flush
          SDL.present renderer
          --
-         threadDelay 20000
          unless quit loop
    loop
    -- releasing resources
@@ -54,3 +60,10 @@ lesson07 = do
    SDL.destroyRenderer renderer
    SDL.destroyTexture imgTx
    SDL.quit
+
+-- if something wrong then exit the program
+run :: IO a -> String -> IO a
+run exec errMessage =
+    catch exec
+          (\e -> do let err = show (e :: IOException)
+                    die (errMessage ++ " SDL_Error: "++ err))
