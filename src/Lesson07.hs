@@ -6,7 +6,7 @@ import qualified SDL
 import Linear.V4 (V4(..))
 --
 import Control.Monad (unless,when)
-import Control.Exception (catch,IOException)
+import Control.Exception (catch)
 --
 import qualified Config
 --
@@ -65,5 +65,5 @@ lesson07 = do
 run :: IO a -> String -> IO a
 run exec errMessage =
     catch exec
-          (\e -> do let err = show (e :: IOException)
-                    die (errMessage ++ " SDL_Error: "++ err))
+          (\e -> do let err = show (e :: SDL.SDLException)
+                    die (errMessage ++ "\nSDL_Error: "++ err))
