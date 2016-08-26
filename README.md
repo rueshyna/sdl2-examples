@@ -15,6 +15,10 @@ resolver: lts-6.9
 > stack build
 > stack exec main #n
 ```
+or
+```bash
+> stack build --exec "main #n"
+```
 
 where `#n` is the number of lesson.
 
