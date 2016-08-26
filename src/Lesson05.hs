@@ -8,7 +8,7 @@ import Linear.Affine(Point(P))
 --
 import Control.Monad (unless)
 import Control.Applicative ((<*))
-import Control.Exception (catch,IOException)
+import Control.Exception (catch)
 --
 import qualified Config
 --
@@ -44,6 +44,7 @@ lesson05 = do
                  "Window could not be created!"
 
    gSurface <- SDL.getWindowSurface window
+
    sf <- run (optLoadBMPwith gSurface "./img/05/up.bmp")
              "Failed to load stretching image"
    let
@@ -69,5 +70,5 @@ lesson05 = do
 run :: IO a -> String -> IO a
 run exec errMessage =
     catch exec
-          (\e -> do let err = show (e :: IOException)
-                    die (errMessage ++ " SDL_Error: "++ err))
+          (\e -> do let err = show (e :: SDL.SDLException)
+                    error (errMessage ++ "\nSDL_Error: "++ err))

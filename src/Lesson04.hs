@@ -10,7 +10,7 @@ import Data.Maybe
 --
 import Control.Concurrent (threadDelay)
 import Control.Monad (unless)
-import Control.Exception (catch,IOException)
+import Control.Exception (catch)
 --
 import qualified Config
 --
@@ -92,5 +92,5 @@ eventToSurface _ _ _ _ _ _      = Nothing
 run :: IO a -> String -> IO a
 run exec errMessage =
     catch exec
-          (\e -> do let err = show (e :: IOException)
-                    die (errMessage ++ " SDL_Error: "++ err))
+          (\e -> do let err = show (e :: SDL.SDLException)
+                    die (errMessage ++ "\nSDL_Error: "++ err))
