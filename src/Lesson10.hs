@@ -60,7 +60,7 @@ lesson10 = do
        "SDL could not initialize!"
 
    -- create window
-   window <- run (SDL.createWindow "Lesson09" Config.winConfig)
+   window <- run (SDL.createWindow "Lesson10" Config.winConfig)
                  "Window could not be created!"
    SDL.HintRenderScaleQuality SDL.$= SDL.ScaleLinear
    renderer <- SDL.createRenderer window (-1) Config.rdrConfig
