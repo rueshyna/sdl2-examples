@@ -9,10 +9,13 @@ import Linear.Affine (Point(..))
 import Linear.V2 (V2(..))
 import Linear.V4 (V4(..))
 --
-import Control.Concurrent (threadDelay)
 import Control.Monad (unless,forM_)
+import Control.Exception (catch)
 --
 import qualified Config
+--
+import System.Exit (die)
+--
 --
 -- defne colors with RGBA
 v4White, v4Black, v4Green, v4Red, v4Blue, v4Yellow :: V4 Word8
@@ -25,12 +28,18 @@ v4Yellow = V4 maxBound maxBound minBound maxBound
 --
 lesson08 :: IO ()
 lesson08 = do
-   SDL.initialize [SDL.InitVideo]
-   window <- SDL.createWindow "Lesson08" Config.winConfig
-   renderer <- SDL.createRenderer window (-1) Config.rdrConfig
+   -- initialize SDL
+   run (SDL.initialize [SDL.InitVideo])
+       "SDL could not initialize!"
+
+   -- create window
+   window <- run (SDL.createWindow "Lesson08" Config.winConfig)
+                 "Window could not be created!"
    SDL.HintRenderScaleQuality SDL.$= SDL.ScaleLinear
+   renderer <- run (SDL.createRenderer window (-1) Config.rdrConfig)
+                   "Renderer could not be created!"
+   -- initialize renderer color
    SDL.rendererDrawColor renderer SDL.$= v4White
-   SDL.showWindow window
    let
       loop = do
          events <- SDL.pollEvents
@@ -64,9 +73,15 @@ lesson08 = do
          --
          SDL.present renderer
          -- *** end of drawing region ***
-         threadDelay 20000
          unless quit loop
    loop
-   SDL.destroyWindow window
    SDL.destroyRenderer renderer
+   SDL.destroyWindow window
    SDL.quit
+
+-- if something wrong then exit the program
+run :: IO a -> String -> IO a
+run exec errMessage =
+    catch exec
+          (\e -> do let err = show (e :: SDL.SDLException)
+                    die (errMessage ++ "\nSDL_Error: "++ err))
