@@ -10,10 +10,12 @@ import Linear.V2 (V2(..))
 import Linear.V4 (V4(..))
 import Foreign.C.Types (CInt)
 --
-import Control.Concurrent (threadDelay)
 import Control.Monad (unless)
+import Control.Exception (catch)
 --
 import qualified Config
+--
+import System.Exit (die)
 --
 
 -- setup xywh for all clips
@@ -35,10 +37,12 @@ data LTexture = LTexture {getTx :: SDL.Texture, getWH :: (V2 CInt)}
 --
 class Renderable a where
    render :: SDL.Renderer -> a -> SDL.Rectangle CInt -> V2 CInt -> IO ()
+   free :: a ->  IO ()
 --
 instance Renderable LTexture where
    render rdr ltx xywh@(SDL.Rectangle _ (V2 w h)) xy = do
       SDL.copy rdr (getTx ltx) (Just xywh) (Just $ SDL.Rectangle (P xy) (V2 w h))
+   free ltx = SDL.destroyTexture (getTx ltx)
 
 -- definition of loading function
 loadFromFile :: SDL.Renderer -> FilePath -> IO LTexture
@@ -54,13 +58,17 @@ loadFromFile rdr path = do
 --
 lesson11 :: IO ()
 lesson11 = do
-   SDL.initialize [SDL.InitVideo]
-   window <- SDL.createWindow "Lesson11" Config.winConfig
+   -- initialize SDL
+   run (SDL.initialize [SDL.InitVideo])
+       "SDL could not initialize!"
+
+   -- create window
+   window <- run (SDL.createWindow "Lesson11" Config.winConfig)
+                 "Window could not be created!"
    renderer <- SDL.createRenderer window (-1) Config.rdrConfig
    SDL.HintRenderScaleQuality SDL.$= SDL.ScaleLinear
    SDL.rendererDrawColor renderer SDL.$=
       V4 maxBound maxBound minBound maxBound
-   SDL.showWindow window
 
    gSpriteSheetTexture <- loadFromFile renderer "./img/11/sprite.bmp"
 
@@ -86,10 +94,16 @@ lesson11 = do
          --
          SDL.present renderer
          -- *** end of drawing region ***
-         threadDelay 20000
          unless quit loop
    loop
-   SDL.destroyWindow window
+   free gSpriteSheetTexture
    SDL.destroyRenderer renderer
+   SDL.destroyWindow window
    SDL.quit
+
 --
+run :: IO a -> String -> IO a
+run exec errMessage =
+    catch exec
+          (\e -> do let err = show (e :: SDL.SDLException)
+                    die (errMessage ++ "\nSDL_Error: "++ err))
