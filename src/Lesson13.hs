@@ -47,6 +47,21 @@ loadFromFile rdr path = do
    return (LTexture tx wh)
 
 --
+
+class (Bounded a, Num a, Ord a) => BoundedNum a where
+    (>+<) :: a -> a -> a
+    (>+<) a diff
+        | diff <= maxDiff = a + diff
+        | diff > maxDiff = maxBound
+        where maxDiff = maxBound - a
+    (>-<) :: a -> a -> a
+    (>-<) a diff
+        | diff <= minDiff = a - diff
+        | diff > minDiff = minBound
+        where minDiff = a - minBound
+
+instance BoundedNum Word8
+
 lesson13 :: IO ()
 lesson13 = do
    -- initialize SDL
@@ -76,16 +91,11 @@ lesson13 = do
 
          let pressedKey =  map (SDL.keysymKeycode . SDL.keyboardEventKeysym) $ checkKeySym $ map SDL.eventPayload events
 
-         let adjustAlpha SDL.KeycodeW = 9
-             adjustAlpha SDL.KeycodeS = -9
-             adjustAlpha _ = 0
+         let adjustAlpha SDL.KeycodeW = (>+< 9)
+             adjustAlpha SDL.KeycodeS = (>-< 9)
+             adjustAlpha _ = (>+< 0)
 
-         let alphaBound a
-                | a < 0   = 0
-                | a > 255 = 255
-                | otherwise = a
-
-         let alpha' =  alphaBound $ foldr (+) alpha $ map adjustAlpha pressedKey
+         let alpha' =  foldr adjustAlpha alpha pressedKey
 
          SDL.rendererDrawColor renderer SDL.$= V4 maxBound maxBound maxBound maxBound
          SDL.clear renderer
