@@ -14,6 +14,7 @@ import Lesson12
 import Lesson13
 import Lesson14
 import Lesson15
+import Lesson17
 --
 import System.Environment
 --
@@ -35,5 +36,6 @@ main = do
       13 -> lesson13
       14 -> lesson14
       15 -> lesson15
+      17 -> lesson17
       _ -> print $ "Lesson " ++ (show i) ++ " is undefined"
    return ()
