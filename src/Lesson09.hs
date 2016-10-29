@@ -12,11 +12,8 @@ import Foreign.C.Types (CInt)
 --
 import Control.Monad (unless,forM_)
 import Control.Applicative ((<*))
-import Control.Exception (catch)
 --
 import qualified Config
---
-import System.Exit (die)
 --
 
 -- define viewports
@@ -34,12 +31,11 @@ viewportD  = Just $ SDL.Rectangle
 lesson09 :: IO ()
 lesson09 = do
    -- initialize SDL
-   run (SDL.initialize [SDL.InitVideo])
-       "SDL could not initialize!"
+   SDL.initialize [SDL.InitVideo]
 
    -- create window
-   window <- run (SDL.createWindow "Lesson09" Config.winConfig)
-                 "Window could not be created!"
+   window <- SDL.createWindow "Lesson09" Config.winConfig
+
    SDL.HintRenderScaleQuality SDL.$= SDL.ScaleLinear
    renderer <- SDL.createRenderer window (-1) Config.rdrConfig
    SDL.rendererDrawColor renderer SDL.$=
@@ -84,10 +80,3 @@ loadImgAsTexture :: SDL.Renderer -> FilePath -> IO SDL.Texture
 loadImgAsTexture rdr path = do
    tempSf <- SDL.loadBMP path
    SDL.createTextureFromSurface rdr tempSf <* SDL.freeSurface tempSf
-
--- if something wrong then exit the program
-run :: IO a -> String -> IO a
-run exec errMessage =
-    catch exec
-          (\e -> do let err = show (e :: SDL.SDLException)
-                    die (errMessage ++ "\nSDL_Error: "++ err))

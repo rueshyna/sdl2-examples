@@ -11,11 +11,8 @@ import Linear.V4 (V4(..))
 import Foreign.C.Types (CInt)
 --
 import Control.Monad (unless)
-import Control.Exception (catch)
 --
 import qualified Config
---
-import System.Exit (die)
 --
 
 -- setup xywh for all clips
@@ -59,12 +56,10 @@ loadFromFile rdr path = do
 lesson11 :: IO ()
 lesson11 = do
    -- initialize SDL
-   run (SDL.initialize [SDL.InitVideo])
-       "SDL could not initialize!"
+   SDL.initialize [SDL.InitVideo]
 
    -- create window
-   window <- run (SDL.createWindow "Lesson11" Config.winConfig)
-                 "Window could not be created!"
+   window <- SDL.createWindow "Lesson11" Config.winConfig
    renderer <- SDL.createRenderer window (-1) Config.rdrConfig
    SDL.HintRenderScaleQuality SDL.$= SDL.ScaleLinear
    SDL.rendererDrawColor renderer SDL.$=
@@ -100,10 +95,3 @@ lesson11 = do
    SDL.destroyRenderer renderer
    SDL.destroyWindow window
    SDL.quit
-
---
-run :: IO a -> String -> IO a
-run exec errMessage =
-    catch exec
-          (\e -> do let err = show (e :: SDL.SDLException)
-                    die (errMessage ++ "\nSDL_Error: "++ err))

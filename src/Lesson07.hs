@@ -6,29 +6,25 @@ import qualified SDL
 import Linear.V4 (V4(..))
 --
 import Control.Monad (unless,when)
-import Control.Exception (catch)
 --
 import qualified Config
 --
-import System.Exit (die)
 
 lesson07 :: IO ()
 lesson07 = do
    -- initialize SDL
-   run (SDL.initialize [SDL.InitVideo])
-       "SDL could not initialize!"
+   SDL.initialize [SDL.InitVideo]
 
    -- create window
-   window <- run (SDL.createWindow "Lesson07" Config.winConfig)
-                 "Window could not be created!"
+   window <- SDL.createWindow "Lesson07" Config.winConfig
+
    -- using Hint, comment out for seeing the effects
    -- reference: https://en.wikipedia.org/wiki/Image_scaling#Scaling_methods
    -- ***************
    SDL.HintRenderScaleQuality SDL.$= SDL.ScaleLinear
    -- ***************
 
-   renderer <- run (SDL.createRenderer window (-1) Config.rdrConfig)
-                   "Renderer could not be created!"
+   renderer <- SDL.createRenderer window (-1) Config.rdrConfig
 
    -- set a color for renderer
    SDL.rendererDrawColor renderer
@@ -60,10 +56,3 @@ lesson07 = do
    SDL.destroyRenderer renderer
    SDL.destroyTexture imgTx
    SDL.quit
-
--- if something wrong then exit the program
-run :: IO a -> String -> IO a
-run exec errMessage =
-    catch exec
-          (\e -> do let err = show (e :: SDL.SDLException)
-                    die (errMessage ++ "\nSDL_Error: "++ err))

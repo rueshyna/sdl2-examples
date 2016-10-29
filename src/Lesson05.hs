@@ -8,11 +8,9 @@ import Linear.Affine(Point(P))
 --
 import Control.Monad (unless)
 import Control.Applicative ((<*))
-import Control.Exception (catch)
 --
 import qualified Config
 --
-import System.Exit (die)
 
 
 -- In fact, SDL converts color mode in every blitting if
@@ -36,17 +34,14 @@ optLoadBMPwith originSf path = do
 lesson05 :: IO ()
 lesson05 = do
    -- initialize SDL
-   run (SDL.initialize [SDL.InitVideo])
-       "SDL could not initialize!"
+   SDL.initialize [SDL.InitVideo]
 
    -- create window
-   window <- run (SDL.createWindow "Lesson05" Config.winConfig)
-                 "Window could not be created!"
+   window <- SDL.createWindow "Lesson05" Config.winConfig
 
    gSurface <- SDL.getWindowSurface window
 
-   sf <- run (optLoadBMPwith gSurface "./img/05/up.bmp")
-             "Failed to load stretching image"
+   sf <- optLoadBMPwith gSurface "./img/05/up.bmp"
    let
       loop = do
          events <- SDL.pollEvents
@@ -64,11 +59,4 @@ lesson05 = do
    SDL.destroyWindow window
    SDL.quit
 
--- .
-
--- if something wrong then exit the program
-run :: IO a -> String -> IO a
-run exec errMessage =
-    catch exec
-          (\e -> do let err = show (e :: SDL.SDLException)
-                    error (errMessage ++ "\nSDL_Error: "++ err))
+--

@@ -11,11 +11,8 @@ import Linear.V4 (V4(..))
 import Foreign.C.Types (CInt)
 --
 import Control.Monad (unless)
-import Control.Exception (catch)
 --
 import qualified Config
---
-import System.Exit (die)
 --
 
 -- definition of LTextureexture
@@ -56,12 +53,11 @@ loadFromFile rdr path = do
 lesson10 :: IO ()
 lesson10 = do
    -- initialize SDL
-   run (SDL.initialize [SDL.InitVideo])
-       "SDL could not initialize!"
+   SDL.initialize [SDL.InitVideo]
 
    -- create window
-   window <- run (SDL.createWindow "Lesson10" Config.winConfig)
-                 "Window could not be created!"
+   window <- SDL.createWindow "Lesson10" Config.winConfig
+
    SDL.HintRenderScaleQuality SDL.$= SDL.ScaleLinear
    renderer <- SDL.createRenderer window (-1) Config.rdrConfig
    SDL.rendererDrawColor renderer SDL.$=
@@ -91,10 +87,3 @@ lesson10 = do
    SDL.destroyRenderer renderer
    SDL.destroyWindow window
    SDL.quit
-
--- if something wrong then exit the program
-run :: IO a -> String -> IO a
-run exec errMessage =
-    catch exec
-          (\e -> do let err = show (e :: SDL.SDLException)
-                    die (errMessage ++ "\nSDL_Error: "++ err))
