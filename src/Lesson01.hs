@@ -6,21 +6,17 @@ import qualified SDL
 import Linear.V4 (V4(..))
 --
 import Control.Concurrent (threadDelay)
-import Control.Exception (catch)
 --
 import qualified Config
 --
-import System.Exit (die)
 
 lesson01 :: IO ()
 lesson01 = do
    -- initialize SDL
-   run (SDL.initialize [SDL.InitVideo])
-       "SDL could not initialize!"
+   SDL.initialize [SDL.InitVideo]
 
    -- create window
-   window <- run (SDL.createWindow "Lesson01" Config.winConfig)
-                 "Window could not be created!"
+   window <- SDL.createWindow "Lesson01" Config.winConfig
 
    -- get surface from given window
    gSurface <- SDL.getWindowSurface window
@@ -42,10 +38,3 @@ lesson01 = do
    -- destroy window
    SDL.destroyWindow window
    SDL.quit
-
--- if something wrong then exit the program
-run :: IO a -> String -> IO a
-run exec errMessage =
-    catch exec
-          (\e -> do let err = show (e :: SDL.SDLException)
-                    die (errMessage ++ "\nSDL_Error: "++ err))

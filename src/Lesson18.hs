@@ -13,11 +13,8 @@ import Data.Maybe
 --
 import Control.Concurrent (threadDelay)
 import Control.Monad (unless)
-import Control.Exception (catch)
 --
 import qualified Config
---
-import System.Exit (die)
 
 -- definition of LTexture
 data LTexture = LTexture {getTx :: SDL.Texture, getWH :: V2 CInt}
@@ -52,12 +49,10 @@ head' (x:xs) = Just x
 lesson18 :: IO ()
 lesson18 = do
    -- initialize SDL
-   run (SDL.initialize [SDL.InitVideo])
-       "SDL could not initialize!"
+   SDL.initialize [SDL.InitVideo]
 
    -- create window
-   window <- run (SDL.createWindow "Lesson18" Config.winConfig)
-                 "Window could not be created!"
+   window <- SDL.createWindow "Lesson18" Config.winConfig
    renderer <- SDL.createRenderer window (-1) Config.rdrConfig
    SDL.HintRenderScaleQuality SDL.$= SDL.ScaleLinear
    SDL.rendererDrawColor renderer SDL.$=
@@ -104,10 +99,3 @@ lesson18 = do
    free picLeft
    free picRight
    SDL.quit
-
--- if something wrong then exit the program
-run :: IO a -> String -> IO a
-run exec errMessage =
-    catch exec
-          (\e -> do let err = show (e :: SDL.SDLException)
-                    die (errMessage ++ "\nSDL_Error: "++ err))

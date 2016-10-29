@@ -10,30 +10,26 @@ import Data.Maybe
 --
 import Control.Concurrent (threadDelay)
 import Control.Monad (unless)
-import Control.Exception (catch)
 --
 import qualified Config
 --
-import System.Exit (die)
 
 lesson04 :: IO ()
 lesson04 = do
    -- initialize SDL
-   run (SDL.initialize [SDL.InitVideo])
-       "SDL could not initialize!"
+   SDL.initialize [SDL.InitVideo]
 
    -- create window
-   window <- run (SDL.createWindow "Lesson04" Config.winConfig)
-                 "Window could not be created!"
+   window <- SDL.createWindow "Lesson04" Config.winConfig
 
    gSurface <- SDL.getWindowSurface window
 
    --
-   picDefault <- run (SDL.loadBMP "./img/04/press.bmp") "failed to load up image!"
-   picUp      <- run (SDL.loadBMP "./img/04/up.bmp") "failed to load up image!"
-   picDown    <- run (SDL.loadBMP "./img/04/down.bmp") "failed to load up image!"
-   picLeft    <- run (SDL.loadBMP "./img/04/left.bmp") "failed to load up image!"
-   picRight   <- run (SDL.loadBMP "./img/04/right.bmp") "failed to load up image!"
+   picDefault <- SDL.loadBMP "./img/04/press.bmp"
+   picUp      <- SDL.loadBMP "./img/04/up.bmp"
+   picDown    <- SDL.loadBMP "./img/04/down.bmp"
+   picLeft    <- SDL.loadBMP "./img/04/left.bmp"
+   picRight   <- SDL.loadBMP "./img/04/right.bmp"
 
    -- function to convert a event into a surface
    let e2s = Last.(eventToSurface picUp picDown picLeft picRight picDefault).SDL.eventPayload
@@ -87,10 +83,3 @@ eventToSurface picUp
       otherwise        -> Nothing
 -- if input event is not KeyboardEvent then return Nothing
 eventToSurface _ _ _ _ _ _      = Nothing
-
--- if something wrong then exit the program
-run :: IO a -> String -> IO a
-run exec errMessage =
-    catch exec
-          (\e -> do let err = show (e :: SDL.SDLException)
-                    die (errMessage ++ "\nSDL_Error: "++ err))

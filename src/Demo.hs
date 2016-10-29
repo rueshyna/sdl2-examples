@@ -17,9 +17,18 @@ import Lesson15
 import Lesson17
 import Lesson18
 --
+import qualified SDL
 import System.Environment
+import System.Exit (die)
+import Control.Exception (catch)
 --
-main = do
+main :: IO ()
+main = catch runLesson
+      (\e -> do let err = show (e :: SDL.SDLException)
+                die ("SDL_Error: "++ err))
+
+runLesson :: IO ()
+runLesson = do
    args <- getArgs
    let i = (read $ head (args++["0"])) :: Int
    case i of
