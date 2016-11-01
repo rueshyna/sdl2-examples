@@ -21,6 +21,7 @@ import qualified SDL
 import System.Environment
 import System.Exit (die)
 import Control.Exception (catch)
+import Utility
 --
 main :: IO ()
 main = catch runLesson

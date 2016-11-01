@@ -11,6 +11,8 @@ import Control.Applicative ((<*))
 --
 import qualified Config
 --
+import Utility
+--
 
 
 -- In fact, SDL converts color mode in every blitting if
@@ -18,8 +20,8 @@ import qualified Config
 -- the color mode of target surface.
 -- To avoid those converting, a simple way is to
 -- align their color mode whenever we load an image.
-optLoadBMPwith :: SDL.Surface -> FilePath -> IO SDL.Surface
-optLoadBMPwith originSf path = do
+optLoadBmpPic :: SDL.Surface -> FilePath -> IO SDL.Surface
+optLoadBmpPic originSf path = do
    imgSf <- SDL.loadBMP path
    -- get the color mode of given surface
    spf <- SDL.surfaceFormat originSf
@@ -31,32 +33,23 @@ optLoadBMPwith originSf path = do
    -- SDL.freeSurface imgSf
    -- return optSf
 --
+
 lesson05 :: IO ()
-lesson05 = do
-   -- initialize SDL
-   SDL.initialize [SDL.InitVideo]
+lesson05
+    = (^.^) sdlInit ()                 -- initialize SDL
+    $ \() -> (^.^) window "Lesson05"   -- create window
+    $ \w -> (^.^) surface w            -- get surface from given window
+    $ \s -> (^.^) (uncurry optLoadBmpPic, SDL.freeSurface) (s, "./img/hellowworld.bmp")
+    $ \o -> do
 
-   -- create window
-   window <- SDL.createWindow "Lesson05" Config.winConfig
-
-   gSurface <- SDL.getWindowSurface window
-
-   sf <- optLoadBMPwith gSurface "./img/05/up.bmp"
-   let
-      loop = do
-         events <- SDL.pollEvents
-         let quit = any (== SDL.QuitEvent) $ map SDL.eventPayload events
-         -- blit with given scaling setup
-         -- Nothing for default setup - blitting with fully filling
-         SDL.surfaceBlitScaled sf Nothing gSurface
-            $ Just $ SDL.Rectangle (P (V2 0 0)) (V2 200 200)
-         SDL.updateWindowSurface window
-         unless quit loop
-   loop
-
-   -- Free resources and close SDL
-   SDL.freeSurface sf
-   SDL.destroyWindow window
-   SDL.quit
-
---
+      let
+         loop = do
+            events <- SDL.pollEvents
+            let quit = any (== SDL.QuitEvent) $ map SDL.eventPayload events
+            -- blit with given scaling setup
+            -- Nothing for default setup - blitting with fully filling
+            SDL.surfaceBlitScaled o Nothing s
+               $ Just $ SDL.Rectangle (P (V2 0 0)) (V2 400 300)
+            SDL.updateWindowSurface w
+            unless quit loop
+      loop

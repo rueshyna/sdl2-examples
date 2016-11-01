@@ -7,37 +7,22 @@ import Linear.V4 (V4(..))
 --
 import Control.Concurrent (threadDelay)
 --
-import qualified Config
+import Utility
 --
 
 lesson02 :: IO ()
-lesson02 = do
-   -- initialize SDL
-   SDL.initialize [SDL.InitVideo]
+lesson02
+    = (^.^) sdlInit ()                 -- initialize SDL
+    $ \() -> (^.^) window "Lesson02"   -- create window
+    $ \w -> (^.^) surface w            -- get surface from given window
+    $ \s -> (^.^) loadBmpPic "./img/hellowworld.bmp"  -- load image file as a surface
+    $ \p -> do
 
-   -- create window
-   window <- SDL.createWindow "Lesson02" Config.winConfig
+      -- blit(copy/show) image surface onto window surface
+      SDL.surfaceBlit p Nothing s Nothing
 
-   -- get surface from given window
-   gSurface <- SDL.getWindowSurface window
+      -- update the surface
+      SDL.updateWindowSurface w
 
-   -- load image file as a surface
-   pictureS <- SDL.loadBMP "./img/02/Broom.bmp"
-
-   -- blit(copy/show) image surface onto window surface
-   SDL.surfaceBlit pictureS Nothing gSurface Nothing
-
-   -- update the surface
-   SDL.updateWindowSurface window
-
-   -- wait two seconds
-   threadDelay 2000000
-
-   -- free surface
-   SDL.freeSurface pictureS
-
-   -- destroy window
-   SDL.destroyWindow window
-
-   -- quit SDL subsystems
-   SDL.quit
+      -- wait two seconds
+      threadDelay 2000000

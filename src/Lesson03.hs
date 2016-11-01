@@ -8,40 +8,30 @@ import Linear.V4 (V4(..))
 import Control.Concurrent (threadDelay)
 import Control.Monad (unless)
 --
-import qualified Config
+import Utility
 --
 
 lesson03 :: IO ()
-lesson03 = do
-   -- initialize SDL
-   SDL.initialize [SDL.InitVideo]
+lesson03
+    = (^.^) sdlInit ()                 -- initialize SDL
+    $ \() -> (^.^) window "Lesson03"   -- create window
+    $ \w -> (^.^) surface w            -- get surface from given window
+    $ \s -> (^.^) loadBmpPic "./img/hellowworld.bmp" -- load image file as a surface
+    $ \p -> do
 
-   -- create window
-   window <- SDL.createWindow "Lesson03" Config.winConfig
+      let
+         loop = do
+            -- fetch all events from events pool
+            events <- SDL.pollEvents
+            -- check the existence of QuitEvent
+            let quit = any (== SDL.QuitEvent) $ map SDL.eventPayload events
 
-   -- get surface from given window
-   gSurface <- SDL.getWindowSurface window
+            --blit(copy/show) image surface onto window surface-}
+            SDL.surfaceBlit p Nothing s Nothing
 
-   -- load image file as a surface
-   pictureS <- SDL.loadBMP "./img/03/Broom.bmp"
+            -- update the surface
+            SDL.updateWindowSurface w
+            unless quit loop
 
-   -- define the main loop
-   let
-      loop = do
-         -- fetch all events from events pool
-         events <- SDL.pollEvents
-         -- check the existence of QuitEvent
-         let quit = any (== SDL.QuitEvent) $ map SDL.eventPayload events
-
-         -- blit(copy/show) image surface onto window surface
-         SDL.surfaceBlit pictureS Nothing gSurface Nothing
-
-         -- update the surface
-         SDL.updateWindowSurface window
-         unless quit loop
-
-   -- exec our main loop
-   loop
-   SDL.destroyWindow window
-   SDL.freeSurface pictureS
-   SDL.quit
+      -- exec our main loop
+      loop

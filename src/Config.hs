@@ -1,11 +1,11 @@
 module Config where
 --
-import qualified SDL as SDL
+import qualified SDL
 import Linear.V2 (V2(..))
 --
 --
-winW  = 640
-winH  = 480
+winW  = 800
+winH  = 600
 winV2 = V2 winW winH
 --
 winConfig = SDL.defaultWindow

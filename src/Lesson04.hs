@@ -11,54 +11,41 @@ import Data.Maybe
 import Control.Concurrent (threadDelay)
 import Control.Monad (unless)
 --
-import qualified Config
+import Utility
 --
 
 lesson04 :: IO ()
-lesson04 = do
-   -- initialize SDL
-   SDL.initialize [SDL.InitVideo]
+lesson04
+    = (^.^) sdlInit ()                 -- initialize SDL
+    $ \() -> (^.^) window "Lesson04"   -- create window
+    $ \w -> (^.^) surface w            -- get surface from given window
+    -- load image file as a surface
+    $ \s -> (^.^) loadBmpPic "./img/press.bmp"  -- default image
+    $ \p -> (^.^) loadBmpPic "./img/up.bmp"     -- up image
+    $ \u -> (^.^) loadBmpPic "./img/down.bmp"   -- down impage
+    $ \d -> (^.^) loadBmpPic "./img/left.bmp"   -- left impage
+    $ \l -> (^.^) loadBmpPic "./img/right.bmp"  -- right image
+    $ \r -> do
 
-   -- create window
-   window <- SDL.createWindow "Lesson04" Config.winConfig
+      -- function to convert a event into a surface
+      let e2s = Last.(eventToSurface u d l r p).SDL.eventPayload
 
-   gSurface <- SDL.getWindowSurface window
+      -- define main loop with extra parameter: current blitted surface
+      let loop = \prevSurface -> do
+            events <- SDL.pollEvents
+            let quit = any (== SDL.QuitEvent) $ map SDL.eventPayload events
+            let newSurface =
+                  fromMaybe prevSurface
+                  -- select the last surface (or nothing)
+                  $ getLast
+                  -- convert all events into a list of Maybe surface
+                  $ foldMap e2s events
+            SDL.surfaceBlit newSurface Nothing s Nothing
+            SDL.updateWindowSurface w
+            unless quit $ loop newSurface
 
-   --
-   picDefault <- SDL.loadBMP "./img/04/press.bmp"
-   picUp      <- SDL.loadBMP "./img/04/up.bmp"
-   picDown    <- SDL.loadBMP "./img/04/down.bmp"
-   picLeft    <- SDL.loadBMP "./img/04/left.bmp"
-   picRight   <- SDL.loadBMP "./img/04/right.bmp"
-
-   -- function to convert a event into a surface
-   let e2s = Last.(eventToSurface picUp picDown picLeft picRight picDefault).SDL.eventPayload
-
-   -- define main loop with extra parameter: current blitted surface
-   let loop = \prevSurface -> do
-         events <- SDL.pollEvents
-         let quit = any (== SDL.QuitEvent) $ map SDL.eventPayload events
-         let newSurface =
-               fromMaybe prevSurface
-               -- select the last surface (or nothing)
-               $ getLast
-               -- convert all events into a list of Maybe surface
-               $ foldMap e2s events
-         SDL.surfaceBlit newSurface Nothing gSurface Nothing
-         SDL.updateWindowSurface window
-         unless quit $ loop newSurface
-
-   -- exec main loop
-   loop picDefault
-
-   -- release resources
-   SDL.destroyWindow window
-   SDL.freeSurface picDefault
-   SDL.freeSurface picUp
-   SDL.freeSurface picDown
-   SDL.freeSurface picLeft
-   SDL.freeSurface picRight
-   SDL.quit
+      -- exec main loop
+      loop p
 
 -- to decide a surface to blit from given event info.
 eventToSurface :: SDL.Surface -- for up-event
