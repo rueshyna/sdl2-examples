@@ -1,7 +1,7 @@
 Name:                   sdl2-examples
 Version:                0.0.0.1
-Author:                 Yun-Yan Chi
-Maintainer:             jaiyalas@gmail.com
+Author:                 Yun-Yan Chi, Chia-Chi Tsai
+Maintainer:             jaiyalas@gmail.com, rueshyna@gmail.com
 Cabal-Version:          >= 1.12
 Build-Type:             Simple
 --
