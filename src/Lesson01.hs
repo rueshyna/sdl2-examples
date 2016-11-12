@@ -3,18 +3,18 @@
 module Lesson01 where
 --
 import qualified SDL
-import Linear.V4 (V4(..))
 --
+import Linear.V4 (V4(..))
 import Control.Concurrent (threadDelay)
 --
-import Utility
+import PixelPen
 --
 
 lesson01 :: IO ()
 lesson01
-    = (^.^) sdlInit ()                 -- initialize SDL
-    $ \() -> (^.^) window "Lesson01"   -- create window
-    $ \w -> (^.^) surface w            -- get surface from given window
+    = (^.^) sdlInitVideo ()                   -- initialize SDL
+    $ \() -> (^.^) defaultWindow "Lesson01"   -- create window
+    $ \w -> (^.^) surface w                   -- get surface from given window
     $ \s -> do
 
        -- fill the global surface with black

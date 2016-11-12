@@ -2,6 +2,7 @@ flags: {}
 extra-package-dbs: []
 packages:
 - '.'
+- '../pixel-pen'
 extra-deps:
 - AC-Boolean-1.1.0
 resolver: lts-6.9

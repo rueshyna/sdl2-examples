@@ -9,9 +9,8 @@ import Linear.Affine(Point(P))
 import Control.Monad (unless)
 import Control.Applicative ((<*))
 --
-import qualified Config
---
-import Utility
+import Config
+import PixelPen
 --
 
 
@@ -36,10 +35,10 @@ optLoadBmpPic originSf path = do
 
 lesson05 :: IO ()
 lesson05
-    = (^.^) sdlInit ()                 -- initialize SDL
-    $ \() -> (^.^) window "Lesson05"   -- create window
+    = (^.^) sdlInitVideo ()                 -- initialize SDL
+    $ \() -> (^.^) window (genConf "Lesson05")   -- create window
     $ \w -> (^.^) surface w            -- get surface from given window
-    $ \s -> (^.^) (uncurry optLoadBmpPic, SDL.freeSurface) (s, "./img/hellowworld.bmp")
+    $ \s -> (^.^) (uncurry optLoadBmpPic, SDL.freeSurface) (s, "./img/helloWorld.bmp")
     $ \o -> do
 
       let

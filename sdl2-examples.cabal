@@ -15,4 +15,5 @@ executable main
                 , text
                 , transformers
                 , AC-Boolean
+                , pixel-pen
    ghc-options: -O2 -w -main-is Demo

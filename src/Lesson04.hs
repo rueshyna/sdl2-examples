@@ -8,45 +8,32 @@ import Linear.V4 (V4(..))
 import Data.Monoid
 import Data.Maybe
 --
-import Control.Concurrent (threadDelay)
 import Control.Monad (unless)
 --
-import Utility
+import Config
+import PixelPen
 --
 
 lesson04 :: IO ()
 lesson04
-    = (^.^) sdlInit ()                 -- initialize SDL
-    $ \() -> (^.^) window "Lesson04"   -- create window
-    $ \w -> (^.^) surface w            -- get surface from given window
+    = (^.^) sdlInitVideo ()                     -- initialize SDL
+    $ \() -> (^.^) defaultWindow "Lesson04"     -- create window
+    $ \w -> (^.^) surface w                     -- get surface from given window
     -- load image file as a surface
     $ \s -> (^.^) loadBmpPic "./img/press.bmp"  -- default image
     $ \p -> (^.^) loadBmpPic "./img/up.bmp"     -- up image
     $ \u -> (^.^) loadBmpPic "./img/down.bmp"   -- down impage
     $ \d -> (^.^) loadBmpPic "./img/left.bmp"   -- left impage
     $ \l -> (^.^) loadBmpPic "./img/right.bmp"  -- right image
-    $ \r -> do
-
-      -- function to convert a event into a surface
-      let e2s = Last.(eventToSurface u d l r p).SDL.eventPayload
-
-      -- define main loop with extra parameter: current blitted surface
-      let loop = \prevSurface -> do
-            events <- SDL.pollEvents
-            let quit = any (== SDL.QuitEvent) $ map SDL.eventPayload events
-            let newSurface =
-                  fromMaybe prevSurface
-                  -- select the last surface (or nothing)
-                  $ getLast
-                  -- convert all events into a list of Maybe surface
-                  $ foldMap e2s events
-            SDL.surfaceBlit newSurface Nothing s Nothing
-            SDL.updateWindowSurface w
-            unless quit $ loop newSurface
-
-      -- exec main loop
-      loop p
-
+    $ \r -> update_ p $ eventHandle_ checkDefaultQuit
+      (\f t -> do
+               let newS = eventToSurface u d l r p $ SDL.eventPayload f
+               return $ fromMaybe p newS
+      )
+      (\f t -> do
+               SDL.surfaceBlit t Nothing s Nothing
+               SDL.updateWindowSurface w
+      )
 -- to decide a surface to blit from given event info.
 eventToSurface :: SDL.Surface -- for up-event
                -> SDL.Surface -- for down-event

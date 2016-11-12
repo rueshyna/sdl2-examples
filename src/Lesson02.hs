@@ -7,15 +7,15 @@ import Linear.V4 (V4(..))
 --
 import Control.Concurrent (threadDelay)
 --
-import Utility
+import PixelPen
 --
 
 lesson02 :: IO ()
 lesson02
-    = (^.^) sdlInit ()                 -- initialize SDL
-    $ \() -> (^.^) window "Lesson02"   -- create window
-    $ \w -> (^.^) surface w            -- get surface from given window
-    $ \s -> (^.^) loadBmpPic "./img/hellowworld.bmp"  -- load image file as a surface
+    = (^.^) sdlInitVideo ()                          -- initialize SDL
+    $ \() -> (^.^) defaultWindow "Lesson02"          -- create window
+    $ \w -> (^.^) surface w                          -- get surface from given window
+    $ \s -> (^.^) loadBmpPic "./img/helloWorld.bmp"  -- load image file as a surface
     $ \p -> do
 
       -- blit(copy/show) image surface onto window surface

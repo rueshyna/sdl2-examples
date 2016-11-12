@@ -1,6 +1,7 @@
 module Config where
 --
 import qualified SDL
+import qualified Data.Text as T
 import Linear.V2 (V2(..))
 --
 --
@@ -17,3 +18,6 @@ rdrConfig = SDL.RendererConfig
    { SDL.rendererType = SDL.AcceleratedVSyncRenderer
    , SDL.rendererTargetTexture = True
    }
+
+genConf :: T.Text -> (T.Text, SDL.WindowConfig)
+genConf t = (t, winConfig)
