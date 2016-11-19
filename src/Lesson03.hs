@@ -16,7 +16,7 @@ lesson03
     = (^.^) sdlInitVideo ()                         -- initialize SDL
     $ \() -> (^.^) defaultWindow "Lesson03"         -- create window
     $ \w -> (^.^) surface w                         -- get surface from given window
-    $ \s -> (^.^) loadBmpPic "./img/helloWorld.bmp" -- load image file as a surface
+    $ \s -> (^.^) bmpSurface "./img/helloWorld.bmp" -- load image file as a surface
     $ \p -> update $ eventHandle checkDefaultQuit
     $ \e -> do
         {- blit(copy/show) image surface onto window surface -}
