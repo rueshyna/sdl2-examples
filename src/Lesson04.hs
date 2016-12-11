@@ -22,8 +22,8 @@ data Input = IDefault
            deriving (Show, Eq, Ord, Enum)
 
 data Mapping = M Input SDL.Keycode
-
 data Link a = L Input a
+data State a = S [a] a [a]
 
 preLink' :: State (Link String)
 preLink' = S [] ( L IDefault "./img/press.bmp")
@@ -33,8 +33,6 @@ preLink' = S [] ( L IDefault "./img/press.bmp")
                 , L ILeft    "./img/left.bmp"
                 ]
 
-data State a = S [a] a [a]
-
 mapping :: [ Mapping ]
 mapping = [ M IDefault SDL.KeycodeEscape
           , M IDown    SDL.KeycodeDown
@@ -43,10 +41,10 @@ mapping = [ M IDefault SDL.KeycodeEscape
           , M ILeft    SDL.KeycodeLeft
           ]
 
-toInput :: [ Mapping ] -> SDL.Keycode -> Input
-toInput [] _ = IDefault
+toInput :: [ Mapping ] -> SDL.Keycode -> Maybe Input
+toInput [] _ = Nothing
 toInput (M i k:xs) mk
-    | k == mk = i
+    | k == mk = Just i
     | k /= mk = toInput xs mk
 
 class Moveable m where
@@ -85,8 +83,8 @@ lesson04
     $ \s -> (^.^/) bmpSurface preLink'
     $ \l@(S xs y@(L k sur) zs) -> update_ sur $ eventHandle_ checkDefaultQuit
       (\f t -> do
-               let newS = eventToSurface l $ SDL.eventPayload f
-               return $ fromMaybe sur newS
+               let newS = eventToSurface l f
+               return $ fromMaybe t newS
       )
       (\f t -> do
                SDL.surfaceBlit t Nothing s Nothing
@@ -95,12 +93,12 @@ lesson04
 
 -- to decide a surface to blit from given event info.
 eventToSurface :: State (Link SDL.Surface)
-               -> SDL.EventPayload
+               -> SDL.Event
                -> Maybe SDL.Surface
-eventToSurface s@(S xs y@(L i sur) zs) event@(SDL.KeyboardEvent ked)
-    | i < input = eventToSurface (right s) event
-    | i > input = eventToSurface (left s) event
-    | i == input = Just sur
-    where input = toInput mapping $ SDL.keysymKeycode $ SDL.keyboardEventKeysym ked
-
-eventToSurface _ _  = Nothing
+eventToSurface s@(S xs (L i sur) zs) event =
+    case input of
+      Just LT -> eventToSurface (right s) event
+      Just GT -> eventToSurface (left s) event
+      Just EQ -> Just sur
+      Nothing -> Nothing
+      where input = compare i <$> (getKeycode event >>= toInput mapping)
