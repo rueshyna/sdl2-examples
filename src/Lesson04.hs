@@ -21,19 +21,22 @@ data Input = IDefault
            | ILeft
            deriving (Show, Eq, Ord, Enum)
 
-data Mapping = M Input SDL.Keycode
-data Link a = L Input a
+data Mapping a = M Input a
+type MapKeycode = Mapping SDL.Keycode
+type MapPicPath = Mapping String
+type MapPic = Mapping SDL.Surface
+
 data State a = S [a] a [a]
 
-preLink' :: State (Link String)
-preLink' = S [] ( L IDefault "./img/press.bmp")
-                [ L IDown    "./img/down.bmp"
-                , L IUp      "./img/up.bmp"
-                , L IRight   "./img/right.bmp"
-                , L ILeft    "./img/left.bmp"
+mapPicPath :: State (MapPicPath)
+mapPicPath = S [] ( M IDefault "./img/press.bmp")
+                [ M IDown    "./img/down.bmp"
+                , M IUp      "./img/up.bmp"
+                , M IRight   "./img/right.bmp"
+                , M ILeft    "./img/left.bmp"
                 ]
 
-mapping :: [ Mapping ]
+mapping :: [ MapKeycode ]
 mapping = [ M IDefault SDL.KeycodeEscape
           , M IDown    SDL.KeycodeDown
           , M IUp      SDL.KeycodeUp
@@ -41,7 +44,7 @@ mapping = [ M IDefault SDL.KeycodeEscape
           , M ILeft    SDL.KeycodeLeft
           ]
 
-toInput :: [ Mapping ] -> SDL.Keycode -> Maybe Input
+toInput :: [ MapKeycode ] -> SDL.Keycode -> Maybe Input
 toInput [] _ = Nothing
 toInput (M i k:xs) mk
     | k == mk = Just i
@@ -71,17 +74,17 @@ instance Loadable State where
   load = mapM
   unload = mapM_
 
-instance Loadable Link where
-  load f (L k a) = L k <$> f a
-  unload f (L k a) = f a
+instance Loadable Mapping where
+  load f (M k a) = M k <$> f a
+  unload f (M k a) = f a
 
 lesson04 :: IO ()
 lesson04
     = (^.^) sdlInitVideo ()                     -- initialize SDL
     $ \() -> (^.^) defaultWindow "Lesson04"     -- create window
     $ \w -> (^.^) surface w                     -- get surface from given window
-    $ \s -> (^.^/) bmpSurface preLink'
-    $ \l@(S xs y@(L k sur) zs) -> update_ sur $ eventHandle_ checkDefaultQuit
+    $ \s -> (^.^/) bmpSurface mapPicPath
+    $ \l@(S xs y@(M k sur) zs) -> update_ sur $ eventHandle_ checkDefaultQuit
       (\f t -> do
                let newS = eventToSurface l f
                return $ fromMaybe t newS
@@ -92,10 +95,10 @@ lesson04
       )
 
 -- to decide a surface to blit from given event info.
-eventToSurface :: State (Link SDL.Surface)
+eventToSurface :: State (MapPic)
                -> SDL.Event
                -> Maybe SDL.Surface
-eventToSurface s@(S xs (L i sur) zs) event =
+eventToSurface s@(S xs (M i sur) zs) event =
     case input of
       Just LT -> eventToSurface (right s) event
       Just GT -> eventToSurface (left s) event
