@@ -11,9 +11,9 @@ import PixelPen
 
 lesson05 :: IO ()
 lesson05
-    = (^.^) sdlInitVideo ()                 -- initialize SDL
+    = (^.^) sdlInitVideo ()                   -- initialize SDL
     $ \() -> (^.^) defaultWindow "Lesson05"   -- create window
-    $ \w -> (^.^) surface w            -- get surface from given window
+    $ \w -> (^.^) surface w                   -- get surface from given window
     $ \s -> (^.^) optBmpSurface (s, "./img/helloWorld.bmp")
     $ \o -> update $ eventHandle checkDefaultQuit
     $ \e -> do
