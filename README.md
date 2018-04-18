@@ -1,14 +1,8 @@
-# SDL2 Examples
-
-[![Build Status](https://api.travis-ci.org/jaiyalas/sdl2-examples.png?branch=master)](https://travis-ci.org/jaiyalas/sdl2-examples)
-[![MIT](http://b.repl.ca/v1/license-MIT-blue.png)](https://en.wikipedia.org/wiki/MIT_License)
-[![Haskell](http://b.repl.ca/v1/language-haskell-orange.png)](http://haskell.org)
+# SDL2 Examples in Pixel Pen
 
 Implementing SDL2 tutorial lessons on [lazyfoo.net](http://lazyfoo.net/tutorials/SDL/) using [SDL2 haskell binding](https://hackage.haskell.org/package/sdl2). (Some of them have been implemented on [haskell-game/sdl2examples/lazyfoo](https://github.com/haskell-game/sdl2/tree/master/examples/lazyfoo).) The plan is to implement 34 selected lessons out of the 55 lessons from the original lazyfoo's tutorial.
 
-以 [sdl2 的 haskell binding](https://hackage.haskell.org/package/sdl2) 實作[lazyfoo.net](http://lazyfoo.net/tutorials/SDL/) 中之課程題目。  (其中部分已實作在 sdl2 haskell binding 的 repository - [haskell-game/sdl2examples/lazyfoo](https://github.com/haskell-game/sdl2/tree/master/examples/lazyfoo) 中。) 計畫是實作其中 34 個選定的課程來實作。
-
-## How to Build and Execute (編譯與執行)
+## How to Build and Execute
 resolver: lts-6.9
 ```bash
 > stack setup
@@ -22,22 +16,22 @@ or
 
 where `#n` is the number of lesson.
 
-其中 `#n` 是 lesson 的代號。
+## Lessons
 
-## Lessons (課程清單)
++ The following is progress for Pixel Pen migration.
 
-### Basic (基礎)
+### Basic
 
 + [X] Lesson 01 - Hello SDL
 + [X] Lesson 02 - Getting an Image on the Screen
 + [X] Lesson 03 - Event Driven Programming
 + [X] Lesson 04 - Key Presses
 + [X] Lesson 05 - Optimized Surface Loading and Soft Stretching
-+ [X] Lesson 07 - Texture Loading and Rendering
-+ [X] Lesson 08 - Geometry Rendering
-+ [X] Lesson 09 - The Viewport
-+ [X] Lesson 10 - Color Keying
-+ [X] Lesson 11 - Clip Rendering and Sprite Sheets
++ [ ] Lesson 07 - Texture Loading and Rendering
++ [ ] Lesson 08 - Geometry Rendering
++ [ ] Lesson 09 - The Viewport
++ [ ] Lesson 10 - Color Keying
++ [ ] Lesson 11 - Clip Rendering and Sprite Sheets
 + [ ] Lesson 12 - Color Modulation
 + [ ] Lesson 13 - Alpha Blending
 + [ ] Lesson 14 - Animated Sprites and Vsync
@@ -54,7 +48,7 @@ where `#n` is the number of lesson.
 + [ ] Lesson 42 - Texture Streaming
 + [ ] Lesson 43 - Render to Texture
 
-### Others (進階/其他)
+### Others
 
 + [ ] Lesson 21 - Sound Effects and Music
 + [ ] Lesson 22 - Timing
@@ -66,7 +60,7 @@ where `#n` is the number of lesson.
 + [ ] Lesson 28 - Per-pixel Collision Detection
 + [ ] Lesson 29 - Circular Collision Detection
 
-### Ignored (不打算做)
+### Ignored
 
 + Lesson 06 - Extension Libraries and Loading Other Image Formats
 + Lesson 19 - Gamepads and Joysticks
